@@ -13,6 +13,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
 import com.robotsidekick.util.AppleUtil;
+import com.robotsidekick.util.AppleUtil.MyFullScreenListener;
 
 /**
  * @author alex
@@ -41,11 +42,6 @@ public final class LCDFixerWindow extends JPanel
 
         setFullScreen(false);
 
-        if (AppleUtil.isLion())
-        {
-            AppleUtil.setWindowCanFullScreen(window, true);
-        }
-
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new FullScreenKeyDispatcher(this));
     }
 
@@ -62,25 +58,40 @@ public final class LCDFixerWindow extends JPanel
         }
 
         window = new JFrame();
+        window.setUndecorated(isFullScreen);
         window.setJMenuBar(iMenuBar);
+        if (window.getJMenuBar() != null)
+        {
+            window.getJMenuBar().setVisible(!isFullScreen);
+        }
         window.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        window.add(this);
+        window.getContentPane().add(this);
 
         if (AppleUtil.isLion())
         {
+            AppleUtil.setWindowCanFullScreen(window, true);
+            AppleUtil.addFullScreenListenerTo(window, new MyFullScreenListener()
+            {
+
+                @Override
+                public void windowExitingFullScreen()
+                {
+                    System.out.println("Exiting Full Screen");
+                }
+
+                @Override
+                public void windowEnteringFullScreen()
+                {
+                    System.out.println("Entering Full Screen");
+                }
+            });
             AppleUtil.requestToggleFullScreen(getWindow());
         }
         else if (AppleUtil.isOsX())
         {
             // OS X doesn't handle full screen very well...
-            window.setUndecorated(isFullScreen);
-            if (window.getJMenuBar() != null)
-            {
-                window.getJMenuBar().setVisible(!isFullScreen);
-            }
             window.setSize(java.awt.Toolkit.getDefaultToolkit().getScreenSize());
             window.setResizable(!isFullScreen);
-            window.setVisible(true);
         }
         else
         {
@@ -89,28 +100,16 @@ public final class LCDFixerWindow extends JPanel
 
             if (ge != null && ge.getScreenDevices() != null && ge.getScreenDevices().length > 0 && ge.getScreenDevices()[0].isFullScreenSupported())
             {
-                window.setUndecorated(isFullScreen);
                 device = ge.getScreenDevices()[0];
                 device.setFullScreenWindow(isFullScreen ? window : null);
-                if (window.getJMenuBar() != null)
-                {
-                    window.getJMenuBar().setVisible(!isFullScreen);
-                }
             }
             else
             {
-                window.setUndecorated(isFullScreen);
-                if (window.getJMenuBar() != null)
-                {
-                    window.getJMenuBar().setVisible(!isFullScreen);
-                }
                 window.setSize(java.awt.Toolkit.getDefaultToolkit().getScreenSize());
                 window.setResizable(!isFullScreen);
-                window.setVisible(true);
             }
-
         }
-
+        window.setVisible(true);
     }
 
     public void setFixer(final LCDFixer lcdfixer)

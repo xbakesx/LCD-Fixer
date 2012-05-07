@@ -65,10 +65,12 @@ public final class ReflectionUtil
         }
         catch (final ClassNotFoundException e)
         {
+            e.printStackTrace();
             return false;
         }
         catch (final Throwable e)
         {
+            e.printStackTrace();
             return false;
         }
     }

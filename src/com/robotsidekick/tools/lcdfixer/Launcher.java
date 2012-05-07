@@ -5,13 +5,18 @@ package com.robotsidekick.tools.lcdfixer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import com.robotsidekick.tools.lcdfixer.fixers.RainbowFixer;
+import com.robotsidekick.tools.lcdfixer.fixers.WhiteBlackFixer;
 import com.robotsidekick.tools.lcdfixer.fixers.WhiteFixer;
+import com.robotsidekick.util.AppleUtil;
 import com.robotsidekick.util.ReflectionUtil;
 
 /**
@@ -23,7 +28,7 @@ public final class Launcher
 
     public static Class<?>[] getAllFixers()
     {
-        return new Class<?>[] { WhiteFixer.class, RainbowFixer.class };
+        return new Class<?>[] { WhiteFixer.class, WhiteBlackFixer.class, RainbowFixer.class };
     }
 
     public static void main(final String[] args)
@@ -84,14 +89,13 @@ public final class Launcher
     private static JMenuItem createFullScreenMenuItem(final LCDFixerWindow window)
     {
         final JMenuItem fullscreen = new JMenuItem("Full Screen", 'F');
-        // fullscreen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F,
-        // AppleUtils.isOsX() ? InputEvent.META_MASK : InputEvent.CTRL_MASK));
+        fullscreen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, AppleUtil.isOsX() ? InputEvent.META_MASK : InputEvent.CTRL_MASK));
         fullscreen.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(final ActionEvent evt)
             {
-                window.setFullScreen(!window.isUndecorated());
+                // FullScreenKeyDispatcher actually handles the key press
             }
         });
         return fullscreen;
